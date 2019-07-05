@@ -23,8 +23,15 @@ class App extends Component {
     this.deleteAppointment = this.deleteAppointment.bind(this);
     this.toggleForm = this.toggleForm.bind(this);
     this.AddAppointments = this.AddAppointments.bind(this);
+    this.changeOrder = this.changeOrder.bind(this);
 
+  }
 
+  changeOrder(order, dir){
+    this.setState({
+      orderBy: order,
+      orderDir: dir
+    });
   }
 
   AddAppointments(apt){
@@ -101,6 +108,7 @@ class App extends Component {
                 <SearchAppointments 
                   orderBy = {this.state.orderBy}
                   orderDir = {this.state.orderDir}
+                  changeOrder={this.changeOrder}
                 />
                 <ListAppointments 
                   appointments={filteredApt} 
