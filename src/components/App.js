@@ -15,9 +15,24 @@ class App extends Component {
     this.state = {
       myName: 'Desta',
       myAppointments: [],
+      formDisplay: false,
       lastIndex: 0
     };
     this.deleteAppointment = this.deleteAppointment.bind(this);
+    this.toggleForm = this.toggleForm.bind(this);
+    this.AddAppointments = this.AddAppointments.bind(this);
+
+
+  }
+
+  AddAppointments(apt){
+    let tempApts = this.state.myAppointments;
+    apt.aptId = this.state.lastIndex;
+    tempApts.unshift(apt);
+    this.setState({
+      myAppointments: tempApts,
+      lastIndex: this.state.lastIndex + 1
+    });
   }
 
   deleteAppointment(apt){
@@ -26,7 +41,13 @@ class App extends Component {
 
     this.setState({
       myAppointments: tempApts
-    })
+    });
+  }
+
+  toggleForm(){
+    this.setState({
+      formDisplay: !this.state.formDisplay
+    });
   }
 
   componentDidMount(){
@@ -35,15 +56,13 @@ class App extends Component {
       .then(result => {
         const apts = result.map(item => {
           item.aptId = this.state.lastIndex;
-          this.setState({ lastIndex: this.state.lastIndex + 1})
+          this.setState({ lastIndex: this.state.lastIndex + 1});
           return item;
-        })
+        });
         this.setState({
           myAppointments: apts
         });
       });
-
-
   }
 
   render(){
@@ -53,7 +72,11 @@ class App extends Component {
           <div className="row">
             <div className="col-md-12 bg-white">
               <div className="container">
-                <AddAppointments />
+                <AddAppointments 
+                    formDisplay={this.state.formDisplay} 
+                    toggleForm={this.toggleForm}
+                    AddAppointments={this.AddAppointments}
+                />
                 <SearchAppointments />
                 <ListAppointments 
                   appointments={this.state.myAppointments} 
@@ -65,7 +88,7 @@ class App extends Component {
           </div>
         </div>
       </main>
-    )
+    );
   }
 }
 
