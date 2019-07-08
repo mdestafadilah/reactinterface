@@ -5,7 +5,7 @@ import AddAppointments from './AddAppointments';
 import ListAppointments from './ListAppointments';
 import SearchAppointments from './SearchAppointments';
 
-import { without } from 'lodash';
+import { findIndex,without } from 'lodash';
 
 // Render Sample with Class
 class App extends Component {
@@ -18,12 +18,15 @@ class App extends Component {
       formDisplay: false,
       orderBy: 'petName',
       orderDir: 'asc',
+      queryText: '',
       lastIndex: 0
     };
     this.deleteAppointment = this.deleteAppointment.bind(this);
     this.toggleForm = this.toggleForm.bind(this);
     this.AddAppointments = this.AddAppointments.bind(this);
     this.changeOrder = this.changeOrder.bind(this);
+    this.searchApt = this.searchApt.bind(this);
+    this.updateInfo = this.updateInfo.bind(this);
 
   }
 
@@ -31,6 +34,17 @@ class App extends Component {
     this.setState({
       orderBy: order,
       orderDir: dir
+    });
+  }
+
+  updateInfo(name, value, id){
+    let tempApts = this.state.myAppointments;
+    let aptIndex = findIndex(this.state.myAppointments, {
+      aptId: id
+    });
+    tempApts[aptIndex][name] = value;
+    this.setState({
+      myAppointments: tempApts
     });
   }
 
@@ -51,6 +65,10 @@ class App extends Component {
     this.setState({
       myAppointments: tempApts
     });
+  }
+
+  searchApt(query){
+    this.setState({queryText: query});
   }
 
   toggleForm(){
@@ -84,7 +102,7 @@ class App extends Component {
       order=-1;
     }
 
-    filteredApt.sort((a,b) => {
+    filteredApt = filteredApt.sort((a,b) => {
       if(a[this.state.orderBy].toLowerCase() <
          b[this.state.orderBy].toLowerCase()
       ) {
@@ -92,6 +110,18 @@ class App extends Component {
       } else {
         return 1 * order;
       }
+    }).filter(eachItem => {
+      return(
+        eachItem['petName']
+        .toLowerCase()
+        .includes(this.state.queryText.toLowerCase()) || 
+        eachItem['ownerName']
+        .toLowerCase()
+        .includes(this.state.queryText.toLowerCase()) || 
+        eachItem['aptNotes']
+        .toLowerCase()
+        .includes(this.state.queryText.toLowerCase())
+      );
     });
 
     return(
@@ -109,10 +139,12 @@ class App extends Component {
                   orderBy = {this.state.orderBy}
                   orderDir = {this.state.orderDir}
                   changeOrder={this.changeOrder}
+                  searchApt={this.searchApt}
                 />
                 <ListAppointments 
                   appointments={filteredApt} 
                   deleteAppointment={this.deleteAppointment}
+                  updateInfo={this.updateInfo}
                 />
 
               </div>
